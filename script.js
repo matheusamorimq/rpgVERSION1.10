@@ -176,26 +176,17 @@ window.addEventListener("load", () => {
 
     const bloodImg = new Image(); bloodImg.src = IMG_PATH + "SANGUE.png"; 
 
-    // =================================================================
-    // --- CONSTANTES DE HEAL/DROP (CORRIGIDO)
-    // =================================================================
-    const RED_HEART_HEAL = 50;
-    const PURPLE_HEART_HEAL = 150;
-    const RED_HEART_DROP_CHANCE = 0.18; // 18%
-    const PURPLE_HEART_DROP_CHANCE = 0.10; // 10%
-    // =================================================================
-
-    // (Códigos de ÁUDIO omitidos para brevidade)
+    // (Códigos de ÁUDIO omitidos para brevidade, eram os mesmos)
     const SWORD_SOUND_VOLUME = 0.6;
     const SWORD_POOL_SIZE = 4; 
     const swordSoundPool = [];
-    for (let i = 0; i < SWORD_POOL_SIZE; i++) { swordSoundPool.push(new Audio(IMG_PATH + "espada.mp3")); swordSoundPool[i].volume = SWORD_SOUND_VOLUME; }
+    for (let i = 0; i < SWORD_POOL_SIZE; i++) { swordSoundPool.push(new Audio(IMG_PATH + "ESPADA.mp3")); swordSoundPool[i].volume = SWORD_SOUND_VOLUME; }
     let currentSoundIndex = 0;
     
     const IMPACT_SOUND_VOLUME = 0.4; 
     const IMPACT_POOL_SIZE = 3; 
     const impactSoundPool = [];
-    for (let i = 0; i < IMPACT_POOL_SIZE; i++) { impactSoundPool.push(new Audio(IMG_PATH + "impacto.mp3")); impactSoundPool[i].volume = IMPACT_SOUND_VOLUME; }
+    for (let i = 0; i < IMPACT_POOL_SIZE; i++) { impactSoundPool.push(new Audio(IMG_PATH + "IMPACTO.mp3")); impactSoundPool[i].volume = IMPACT_SOUND_VOLUME; }
     let currentImpactIndex = 0;
 
     const WALK_SOUND_VOLUME = 0.2; 
@@ -245,7 +236,7 @@ window.addEventListener("load", () => {
     const WEAPON_H = 346 * WEAPON_SCALE_FACTOR; 
     // =================================================================
 
-    const PLAYER_BASE = { maxHp: 300, atk: 14, def: 2, speed: 2.5 };
+    const PLAYER_BASE = { maxHp: 300, atk: 14, def: 1, speed: 2.5 };
     const MONSTER_BASE_SPEED = 1.30;
     const PLAYER_ATTACK_RANGE = 120;
     const PLAYER_ATTACK_COOLDOWN = 220;
@@ -495,11 +486,11 @@ window.addEventListener("load", () => {
         upgradeMenu.appendChild(title);
 
         const upgrades = [
-            {text:"Aumentar ATK (+10)", type:"atk"},
-            {text:"Aumentar HP (+80)", type:"hp"},
-            {text:"Aumentar DEF (+2)", type:"def"},
-            {text:"Aumentar VEL (+0.25)", type:"spd"},
-            {text:"Aumentar EXP (+30%)", type:"exp"}
+            {text:"Aumentar ATK (+8)", type:"atk"},
+            {text:"Aumentar HP (+50)", type:"hp"},
+            {text:"Aumentar DEF (+1)", type:"def"},
+            {text:"Aumentar VEL (+0.15)", type:"spd"},
+            {text:"Aumentar EXP (+18%)", type:"exp"}
         ];
 
         for(let u of upgrades){
@@ -516,11 +507,11 @@ window.addEventListener("load", () => {
         // (Lógica de aplicação de upgrade omitida para brevidade, é a mesma)
         if(gameState !== "upgrade") return; 
         
-        if(type==="atk") player.atk+=10;
-        else if(type==="hp"){ player.maxHp+=80; player.hp=player.maxHp; }
-        else if(type==="def") player.def+=2;
-        else if(type==="spd") player.speed=Math.min(6,player.speed+0.25);
-        else if(type==="exp") player.xpMultiplier=+(player.xpMultiplier*1.30).toFixed(2);
+        if(type==="atk") player.atk+=8;
+        else if(type==="hp"){ player.maxHp+=50; player.hp=player.maxHp; }
+        else if(type==="def") player.def+=1;
+        else if(type==="spd") player.speed=Math.min(6,player.speed+0.15);
+        else if(type==="exp") player.xpMultiplier=+(player.xpMultiplier*1.18).toFixed(2);
 
         player.xpToNext = Math.max(10,Math.floor(player.xpToNext*1.25)); 
         
@@ -823,7 +814,6 @@ window.addEventListener("load", () => {
             h.ttl -= delta*16.6667;
             
             if(rectOverlap(player,h)){
-                // A cura é aplicada usando o valor armazenado (h.heal), que será 50 ou 150
                 player.hp = Math.min(player.maxHp, player.hp + h.heal);
                 hearts.splice(i,1); 
                 updateUI();
@@ -1013,41 +1003,15 @@ window.addEventListener("load", () => {
                 } else {
                     giveXP(m.tier*20);
                     
-                    // =================================================================
-                    // LÓGICA DE DROP CORRIGIDA PARA ATENDER AS REGRAS DO USUÁRIO
-                    // =================================================================
-                    let droppedHeart = null;
-
-                    // 1. Tenta drop de CORAÇÃO ROXO (Só se Lv >= 20, 10% de chance)
-                    if (player.level >= 20) {
-                        if (Math.random() < PURPLE_HEART_DROP_CHANCE) { 
-                            droppedHeart = {
-                                x: m.x + m.w / 2 - 16,
-                                y: m.y + m.h / 2 - 16,
-                                w: 32, h: 32,
-                                heal: PURPLE_HEART_HEAL, // Cura 150 HP
-                                ttl: 15000
-                            };
-                        }
+                    if(Math.random()<0.2){
+                        hearts.push({
+                            x: m.x+m.w/2 - 16,
+                            y: m.y+m.h/2 - 16,
+                            w: 32, h: 32,
+                            heal: player.maxHp * 0.1,
+                            ttl: 15000 
+                        });
                     }
-
-                    // 2. Se não dropou Roxo, tenta drop de CORAÇÃO VERMELHO (18% de chance)
-                    if (!droppedHeart) {
-                        if (Math.random() < RED_HEART_DROP_CHANCE) { 
-                            droppedHeart = {
-                                x: m.x + m.w / 2 - 16,
-                                y: m.y + m.h / 2 - 16,
-                                w: 32, h: 32,
-                                heal: RED_HEART_HEAL, // Cura 50 HP
-                                ttl: 15000
-                            };
-                        }
-                    }
-
-                    if (droppedHeart) {
-                        hearts.push(droppedHeart);
-                    }
-                    // =================================================================
                     
                     if(m.tier===5){
                         isVictory=true;
@@ -1072,9 +1036,9 @@ window.addEventListener("load", () => {
     }
     
     function drawHearts(){
+        // (Lógica de corações omitida para brevidade, é a mesma)
         for(const h of hearts){
-            // CONDIÇÃO CORRIGIDA: Usa o valor de cura fixo para determinar o sprite
-            const heartImg = h.heal === PURPLE_HEART_HEAL ? coracaoRoxoImg : coracaoImg;
+            const heartImg = h.heal >= player.maxHp * 0.15 ? coracaoRoxoImg : coracaoImg;
             if(heartImg.complete) ctx.drawImage(heartImg,h.x,h.y,h.w,h.h);
             
             const opacity = Math.min(1, h.ttl/5000); 
