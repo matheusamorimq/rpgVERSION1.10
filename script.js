@@ -236,7 +236,7 @@ window.addEventListener("load", () => {
     const WEAPON_H = 346 * WEAPON_SCALE_FACTOR; 
     // =================================================================
 
-    const PLAYER_BASE = { maxHp: 300, atk: 14, def: 1, speed: 2.5 };
+    const PLAYER_BASE = { maxHp: 300, atk: 14, def: 2, speed: 2.5 };
     const MONSTER_BASE_SPEED = 1.30;
     const PLAYER_ATTACK_RANGE = 120;
     const PLAYER_ATTACK_COOLDOWN = 220;
@@ -486,11 +486,11 @@ window.addEventListener("load", () => {
         upgradeMenu.appendChild(title);
 
         const upgrades = [
-            {text:"Aumentar ATK (+8)", type:"atk"},
-            {text:"Aumentar HP (+50)", type:"hp"},
-            {text:"Aumentar DEF (+1)", type:"def"},
-            {text:"Aumentar VEL (+0.15)", type:"spd"},
-            {text:"Aumentar EXP (+18%)", type:"exp"}
+            {text:"Aumentar ATK (+10)", type:"atk"},
+            {text:"Aumentar HP (+80)", type:"hp"},
+            {text:"Aumentar DEF (+2)", type:"def"},
+            {text:"Aumentar VEL (+0.25)", type:"spd"},
+            {text:"Aumentar EXP (+30%)", type:"exp"}
         ];
 
         for(let u of upgrades){
@@ -511,7 +511,7 @@ window.addEventListener("load", () => {
         else if(type==="hp"){ player.maxHp+=50; player.hp=player.maxHp; }
         else if(type==="def") player.def+=1;
         else if(type==="spd") player.speed=Math.min(6,player.speed+0.15);
-        else if(type==="exp") player.xpMultiplier=+(player.xpMultiplier*1.18).toFixed(2);
+        else if(type==="exp") player.xpMultiplier=+(player.xpMultiplier*1.30).toFixed(2);
 
         player.xpToNext = Math.max(10,Math.floor(player.xpToNext*1.25)); 
         
@@ -1458,3 +1458,4 @@ window.addEventListener("load", () => {
     restartGame();
     animationFrameId = requestAnimationFrame(mainLoop);
 });
+
